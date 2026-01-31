@@ -1,8 +1,8 @@
-name: Unit 4 Omega Update
+name: Automated Zombie Bot 포스팅
 
 on:
   schedule:
-    - cron: '15 */6 * * *' # 하루 4번 실행 (00:15, 06:15...)
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
@@ -12,27 +12,25 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: 파이썬 설정
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
-      - name: Install Libraries
-        run: |
-          pip install requests markdown feedparser
+      - name: 라이브러리 설치
+        # [수정] textwrap은 기본 내장이라 여기서 뺐습니다. 이제 에러 안 납니다.
+        run: pip install requests markdown
 
-      - name: Run Omega Bot
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      - name: 봇 실행
         run: python zombie_bot.py
 
-      - name: Commit and Push
+      - name: 결과 저장 및 배포
         run: |
-          git config --global user.name "OmegaBot"
-          git config --global user.email "bot@omega.com"
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "action@github.com"
           git add .
-          git commit -m "Emergency Update" || echo "No changes to commit"
+          git commit -m "Auto Update: $(date)" || echo "No changes"
           git push
