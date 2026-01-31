@@ -1,0 +1,38 @@
+name: Unit 4 Omega Update
+
+on:
+  schedule:
+    - cron: '15 */6 * * *' # 하루 4번 실행 (00:15, 06:15...)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Libraries
+        run: |
+          pip install requests markdown feedparser
+
+      - name: Run Omega Bot
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python zombie_bot.py
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "OmegaBot"
+          git config --global user.email "bot@omega.com"
+          git add .
+          git commit -m "Emergency Update" || echo "No changes to commit"
+          git push
